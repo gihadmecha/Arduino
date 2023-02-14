@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Start" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets"/>
+
+  <PropertyGroup>
+	  <!-- Default project name.  This is passed by masterbuild.bat in the command line-->
+	  <ProjectName></ProjectName>
+	  
+	  <!-- Config - passed by masterbuild.bat -->
+	  <ProjectConfig>release</ProjectConfig>
+	  
+	  <!-- Path to atmelstudio.exe - expected from masterbuild.bat-->
+	  <AtmelStudio></AtmelStudio>
+	  
+	  <!-- path to deploy.bat - expected from masterbuild.bat -->
+	  <DeployScript></DeployScript>	  
+	
+	  <!-- Solution Directory - expected from masterbuild.bat -->
+	  <TargetSolutionDir></TargetSolutionDir>
+	  
+	  <!-- Project Directory - expected from masterbuild.bat -->
+	  <TargetProjectDir></TargetProjectDir>
+	  
+	  <!-- True if the program will be deployed to a target board.  May be overriden by masterbuild.bat-->
+	  <DeployToBoard>True</DeployToBoard>
+	  
+  </PropertyGroup>
+
+  <Target Name="Build">
+    <Message Importance="high" Text="Building $(ProjectName) project"/>
+	<Message Importance="high" Text="Atmel Studio: $(AtmelStudio)"/>
+	<Message Importance="high" Text="Deployment Script: $(DeployScript)"/>
+    <!--Compile the project	  -->
+	<Exec Command="%22$(AtmelStudio)%22 %22$(ProjectName)%22 /build $(ProjectConfig) /out buildoutput.txt" />
+	<Message Importance="high" Text="Finished $(ProjectName) project"/>
+  </Target>
+
+	<Target Name="Start"  DependsOnTargets="Build">
+		<Message Importance="high" Text="Deploying $(ProjectName) project"/>
+		 <!-- Deploy the project -->
+		<Exec Command="%22$(DeployScript)%22 %22$(TargetSolutionDir)%22 %22$(TargetProjectDir)%22 %22$(ProjectName)%22" Condition="$(DeployToBoard)=='True'"/>
+		<Message Importance="high" Text="Project $(ProjectName) has been deployed"/>
+	</Target>
+	
+</Project>
